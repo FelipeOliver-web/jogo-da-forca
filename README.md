@@ -8,4 +8,4 @@ O Jogo da Forca é um clássico em que o jogador deve adivinhar a palavra secret
 👨‍💻 Desenvolvedores
 Felipe de Oliveira Fonseca Silva
 
-Guilherme
+Guilherme de Queiroz Nunes
