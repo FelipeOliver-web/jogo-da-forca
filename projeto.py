@@ -94,6 +94,18 @@ def desenhar_forca():
         canvas.create_line(150, 120, 170, 150, fill="#555555", width=4)  # felipe: perna direita
         canvas.create_oval(167, 148, 173, 154, fill="black")  # felipe: bota direita
 
+def dar_dica(): # Guilherme: Função para as dicas
+    letras_disponiveis = [letra for letra in set(palavra) if letra not in letras_certas]
+    if letras_disponiveis:
+        dica = random.choice(letras_disponiveis)
+        letras_certas.add(dica)
+        atualizar_palavra()
+        if all(letra in letras_certas for letra in palavra):
+            messagebox.showinfo("Parabéns", "Você venceu!")
+            desativar_jogo()
+    else:
+        messagebox.showinfo("Dica", "Não há mais letras para revelar!")
+
 # --- Interface Gráfica ---
 root = tk.Tk()
 root.title("Jogo da Forca")
@@ -122,6 +134,9 @@ tentativas_label.pack(pady=5)
 
 letras_erradas_label = tk.Label(root, text="", font=("Arial", 14), bg="#e6f2ff", fg="red")  # felipe: exibe letras erradas
 letras_erradas_label.pack(pady=5)
+
+dica_button = tk.Button(root, text="Dica", font=("Arial", 16), command=dar_dica, bg="#cce5ff") # Guilherme: botão para as dicas 
+dica_button.pack(pady=5)
 
 reiniciar_button = tk.Button(root, text="Reiniciar", font=("Arial", 16), command=reiniciar_jogo, bg="#99ccff")  # felipe: botão estilizado
 reiniciar_button.pack(pady=10)
