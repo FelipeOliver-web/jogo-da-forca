@@ -10,6 +10,7 @@ def atualizar_palavra():
     palavra_display = ''.join([letra if letra in letras_certas else '_' for letra in palavra])
     palavra_label.config(text=" ".join(palavra_display))
     letras_erradas_label.config(text="Letras erradas: " + ' '.join(sorted(letras_erradas)))  # felipe: exibir letras erradas
+    dicas_label.config(text=f"Dicas restantes: {dicas_restantes.get()}")
     desenhar_forca()  # felipe: atualizar boneco a cada tentativa errada
 
 def tentar_letra():
@@ -48,6 +49,7 @@ def reiniciar_jogo():
     letras_certas = set()
     letras_erradas = set()
     tentativas_restantes.set(6)
+    dicas_restantes.set(1)  # Guilherme: número de dicas
     letra_entry.config(state="normal")  # felipe: reativa entrada
     tentar_button.config(state="normal")  # felipe: reativa botão
     canvas.delete("all")  # felipe: limpa canvas
@@ -94,11 +96,16 @@ def desenhar_forca():
         canvas.create_line(150, 120, 170, 150, fill="#555555", width=4)  # felipe: perna direita
         canvas.create_oval(167, 148, 173, 154, fill="black")  # felipe: bota direita
 
-def dar_dica(): # Guilherme: Função para as dicas
+def dar_dica(): # Guilherme: função das dicas
+    if dicas_restantes.get() <= 0:
+        messagebox.showinfo("Dicas", "Você não tem mais dicas disponíveis!")
+        return
+
     letras_disponiveis = [letra for letra in set(palavra) if letra not in letras_certas]
     if letras_disponiveis:
         dica = random.choice(letras_disponiveis)
         letras_certas.add(dica)
+        dicas_restantes.set(dicas_restantes.get() - 1)  # Guilherme: Desconta uma dica
         atualizar_palavra()
         if all(letra in letras_certas for letra in palavra):
             messagebox.showinfo("Parabéns", "Você venceu!")
@@ -114,6 +121,7 @@ root.configure(bg="#e6f2ff")  # felipe: cor de fundo da janela
 letras_certas = set()
 letras_erradas = set()
 tentativas_restantes = tk.IntVar(value=6)
+dicas_restantes = tk.IntVar(value=2)  # Guilherme: define quantas dicas o jogador tem
 palavra = escolher_palavra()
 
 canvas = tk.Canvas(root, width=300, height=200, bg="#fff", highlightthickness=0)  # felipe: área de desenho do boneco
@@ -131,6 +139,9 @@ tentar_button.pack(pady=5)
 
 tentativas_label = tk.Label(root, textvariable=tentativas_restantes, font=("Arial", 16), bg="#e6f2ff")  # felipe: fundo azul claro
 tentativas_label.pack(pady=5)
+
+dicas_label = tk.Label(root, text=f"Dicas restantes: {dicas_restantes.get()}", font=("Arial", 14), bg="#e6f2ff")
+dicas_label.pack(pady=5)
 
 letras_erradas_label = tk.Label(root, text="", font=("Arial", 14), bg="#e6f2ff", fg="red")  # felipe: exibe letras erradas
 letras_erradas_label.pack(pady=5)
