@@ -1,49 +1,149 @@
 import random
+import tkinter as tk
+from tkinter import messagebox
 
 def escolher_palavra():
     palavras = ["python", "computador", "programacao", "forca", "teclado"]
     return random.choice(palavras)
 
-def mostrar_palavra(palavra, letras_certas):
-    return ' '.join([letra if letra in letras_certas else '_' for letra in palavra])
+def atualizar_palavra():
+    palavra_display = ''.join([letra if letra in letras_certas else '_' for letra in palavra])
+    palavra_label.config(text=" ".join(palavra_display))
+    letras_erradas_label.config(text="Letras erradas: " + ' '.join(sorted(letras_erradas)))  # felipe: exibir letras erradas
+    desenhar_forca()  # felipe: atualizar boneco a cada tentativa errada
 
-def jogar_forca():
+def tentar_letra():
+    letra = letra_entry.get().lower()
+    letra_entry.delete(0, tk.END)
+
+    if len(letra) != 1 or not letra.isalpha():
+        messagebox.showerror("Erro", "Por favor, digite apenas uma letra!")
+        return
+
+    if letra in letras_certas or letra in letras_erradas:
+        messagebox.showwarning("Aviso", "Você já tentou essa letra.")
+        return
+
+    if letra in palavra:
+        letras_certas.add(letra)
+        atualizar_palavra()
+        if all(letra in letras_certas for letra in palavra):
+            messagebox.showinfo("Parabéns", "Você venceu!")
+            desativar_jogo()  # felipe: desativa o jogo após vitória
+    else:
+        letras_erradas.add(letra)
+        tentativas_restantes.set(tentativas_restantes.get() - 1)
+        atualizar_palavra()
+        if tentativas_restantes.get() == 0:
+            messagebox.showinfo("Fim de jogo", f"Você perdeu! A palavra era: {palavra}")
+            desativar_jogo()  # felipe: desativa o jogo após derrota
+
+def desativar_jogo():
+    letra_entry.config(state="disabled")  # felipe: desativa entrada de texto
+    tentar_button.config(state="disabled")  # felipe: desativa botão
+
+def reiniciar_jogo():
+    global palavra, letras_certas, letras_erradas
     palavra = escolher_palavra()
     letras_certas = set()
     letras_erradas = set()
-    tentativas = 6
+    tentativas_restantes.set(6)
+    letra_entry.config(state="normal")  # felipe: reativa entrada
+    tentar_button.config(state="normal")  # felipe: reativa botão
+    canvas.delete("all")  # felipe: limpa canvas
+    desenhar_base()  # felipe: redesenha forca
+    atualizar_palavra()
 
-    print("🎮 Bem-vindo ao Jogo da Forca!\n")
+def desenhar_base():
+    canvas.create_line(20, 180, 120, 180)  # felipe: base da forca
+    canvas.create_line(70, 180, 70, 20)    # felipe: poste vertical
+    canvas.create_line(70, 20, 150, 20)    # felipe: barra superior
+    canvas.create_line(150, 20, 150, 40)   # felipe: corda
 
-    while tentativas > 0:
-        print(f"\nPalavra: {mostrar_palavra(palavra, letras_certas)}")
-        print(f"Letras erradas: {', '.join(sorted(letras_erradas))}")
-        print(f"Tentativas restantes: {tentativas}")
-        
-        tentativa = input("Digite uma letra: ").lower()
+def desenhar_forca():
+    erros = 6 - tentativas_restantes.get()
 
-        if not tentativa.isalpha() or len(tentativa) != 1:
-            print("⚠️ Digite apenas uma letra.")
-            continue
+    if erros >= 1:
+        # Cabeça com cor de pele
+        canvas.create_oval(135, 40, 165, 70, fill="#ffe0bd")  # felipe: cabeça com cor
 
-        if tentativa in letras_certas or tentativa in letras_erradas:
-            print("⚠️ Você já tentou essa letra.")
-            continue
+        # Olhos
+        canvas.create_oval(142, 48, 146, 52, fill="black")  # felipe: olho esquerdo
+        canvas.create_oval(154, 48, 158, 52, fill="black")  # felipe: olho direito
 
-        if tentativa in palavra:
-            letras_certas.add(tentativa)
-            print("✅ Acertou!")
+        # Boca
+        if tentativas_restantes.get() > 0:
+            canvas.create_arc(144, 55, 156, 65, start=0, extent=180, style=tk.ARC)  # felipe: boca feliz
         else:
-            letras_erradas.add(tentativa)
-            tentativas -= 1
-            print("❌ Errou!")
+            canvas.create_arc(144, 60, 156, 70, start=180, extent=180, style=tk.ARC)  # felipe: boca triste
 
+    if erros >= 2:
+        canvas.create_line(150, 70, 150, 120, fill="#0000cc", width=4)  # felipe: camisa (tronco azul)
+
+    if erros >= 3:
+        canvas.create_line(150, 80, 130, 100, fill="#0000cc", width=4)  # felipe: braço esquerdo
+
+    if erros >= 4:
+        canvas.create_line(150, 80, 170, 100, fill="#0000cc", width=4)  # felipe: braço direito
+
+    if erros >= 5:
+        canvas.create_line(150, 120, 130, 150, fill="#555555", width=4)  # felipe: perna esquerda
+        canvas.create_oval(127, 148, 133, 154, fill="black")  # felipe: bota esquerda
+
+    if erros >= 6:
+        canvas.create_line(150, 120, 170, 150, fill="#555555", width=4)  # felipe: perna direita
+        canvas.create_oval(167, 148, 173, 154, fill="black")  # felipe: bota direita
+
+def dar_dica(): # Guilherme: Função para as dicas
+    letras_disponiveis = [letra for letra in set(palavra) if letra not in letras_certas]
+    if letras_disponiveis:
+        dica = random.choice(letras_disponiveis)
+        letras_certas.add(dica)
+        atualizar_palavra()
         if all(letra in letras_certas for letra in palavra):
-            print(f"\n🎉 Parabéns! Você acertou a palavra: {palavra}")
-            break
+            messagebox.showinfo("Parabéns", "Você venceu!")
+            desativar_jogo()
     else:
-        print(f"\n💀 Você perdeu! A palavra era: {palavra}")
+        messagebox.showinfo("Dica", "Não há mais letras para revelar!")
 
-# Executa o jogo
-if __name__ == "__main__":
-    jogar_forca()
+# --- Interface Gráfica ---
+root = tk.Tk()
+root.title("Jogo da Forca")
+root.configure(bg="#e6f2ff")  # felipe: cor de fundo da janela
+
+letras_certas = set()
+letras_erradas = set()
+tentativas_restantes = tk.IntVar(value=6)
+palavra = escolher_palavra()
+
+canvas = tk.Canvas(root, width=300, height=200, bg="white", highlightthickness=2, highlightbackground="#cccccc")  # felipe: área de desenho do boneco
+canvas.pack(pady=10)
+desenhar_base()  # felipe: desenha estrutura da forca ao iniciar
+
+palavra_label = tk.Label(root, text=" ".join(["_" for _ in palavra]), font=("Helvetica", 28, "bold"), bg="#d0e7ff")# felipe: fundo
+palavra_label.pack(pady=10)
+
+letra_entry = tk.Entry(root, font=("Helvetica", 20), width=3, bd=2, relief="groove")
+letra_entry.pack(pady=5)
+
+tentar_button = tk.Button(root, text="Tentar", font=("Helvetica", 16), command=tentar_letra, bg="#4da6ff", fg="white", padx=10, pady=5)  # felipe: botão estilizado
+tentar_button.pack(pady=5)
+
+tentativas_label = tk.Label(root, text="Tentativas: ", font=("Helvetica", 16), bg="#d0e7ff")
+tentativas_valor = tk.Label(root, textvariable=tentativas_restantes, font=("Helvetica", 16, "bold"), bg="#d0e7ff") 
+tentativas_label.pack(pady=5)
+tentativas_valor.pack(pady=5)
+
+letras_erradas_label = tk.Label(root, text="", font=("Helvetica", 14), bg="#d0e7ff", fg="#cc0000") # felipe: exibe letras erradas
+letras_erradas_label.pack(pady=5)
+
+dica_button = tk.Button(root, text="Dica", font=("Helvetica", 16), command=dar_dica, bg="#80dfff", fg="white", padx=10, pady=5) # Guilherme: botão para as dicas 
+dica_button.pack(pady=5)
+
+reiniciar_button = tk.Button(root, text="Reiniciar", font=("Helvetica", 16), command=reiniciar_jogo, bg="#0059b3", fg="white", padx=10, pady=5) # felipe: botão estilizado
+reiniciar_button.pack(pady=10)
+
+root.bind('<Return>', lambda event: tentar_letra())  # felipe: permite apertar Enter para tentar
+
+reiniciar_jogo()
+root.mainloop()
