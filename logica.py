@@ -1,6 +1,7 @@
 import random
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import PhotoImage
 
 def escolher_palavra():
     palavras = ["python", "computador", "programacao", "forca", "teclado"]
@@ -108,7 +109,9 @@ def dar_dica(): # Guilherme: Função para as dicas
 
 # --- Interface Gráfica ---
 root = tk.Tk()
-root.title("Jogo da Forca")
+root.title("Jogo da Forca") 
+icone = PhotoImage(file="forcalogo.png")
+root.iconphoto(True, icone)
 root.configure(bg="#e6f2ff")  # felipe: cor de fundo da janela
 
 letras_certas = set()
