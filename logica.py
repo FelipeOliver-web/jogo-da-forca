@@ -5,7 +5,7 @@ from tkinter import PhotoImage
 
 def escolher_palavra():
     # Felipe: Adicionadas mais palavras para aumentar a variedade
-    palavras = ["python", "computador", "programacao", "forca", "teclado", "desenvolvimento", "inteligencia", "algoritmo"]
+    palavras = ["python", "computador", "programacao", "forca", "teclado", "desenvolvimento", "inteligencia", "algoritmo","mozão","jeofton","java","html","logica"]
     return random.choice(palavras)
 
 def atualizar_palavra():
