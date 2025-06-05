@@ -4,7 +4,7 @@ from tkinter import messagebox
 from tkinter import PhotoImage
 
 def escolher_palavra():
-    # Felipe: Adicionadas mais palavras para aumentar a variedade
+    # Felipe e Gulherme: Adicionadas mais palavras para aumentar a variedade
     palavras = ["python", "computador", "programacao", "forca", "teclado", "desenvolvimento", "inteligencia", "algoritmo","mozão","jeofton","java","html","logica"]
     return random.choice(palavras)
 
@@ -142,7 +142,7 @@ except tk.TclError:
     pass
 
 # Felipe: Configuração do esquema de cores
-root.configure(bg="#f1d8a1")
+root.configure(bg="#e0f2f7")
 
 letras_certas = set()
 letras_erradas = set()
@@ -156,7 +156,7 @@ canvas.pack(pady=15, padx=15)
 desenhar_base()
 
 # Felipe: Organização dos elementos de interface
-input_frame = tk.Frame(root, bg="#f1d8a1")
+input_frame = tk.Frame(root, bg="#e0f2f7")
 input_frame.pack(pady=10)
 
 palavra_label = tk.Label(input_frame, text=" ".join(["_" for _ in palavra]), font=("Arial", 32, "bold"), bg="#e0f2f7", fg="#333333")
